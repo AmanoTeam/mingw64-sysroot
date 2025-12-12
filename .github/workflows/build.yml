@@ -24,7 +24,7 @@ jobs:
       with:
         tag_name: 0.1
         name: MinGW-w64 system roots
-        files: ./*.xz*
+        files: /tmp/*-w64-*.tar.xz*
         draft: false
         prerelease: false
         fail_on_unmatched_files: true
