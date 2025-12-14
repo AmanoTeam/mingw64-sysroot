@@ -3,13 +3,15 @@
 set -eu
 
 declare -r sysroot_tarball='/tmp/sysroot.tar.zst'
-declare -r sysroot_directory='/tmp/usr'
+declare -r sysroot_directory="${HOME}/tmp/usr"
 
 declare -ra targets=(
 	'x86_64-w64-mingw32'
 	'i686-w64-mingw32'
 	'aarch64-w64-mingw32'
 )
+
+mkdir --parent "${sysroot_directory}"
 
 curl \
 	--url 'https://archlinux.org/packages/extra/any/mingw-w64-crt/download/' \
@@ -73,9 +75,8 @@ tar \
 	--no-same-owner \
 	--no-same-permissions \
 	--touch \
-	--delay-directory-restore \
-	--exclude='.'
-find /tmp
+	--delay-directory-restore
+
 unlink  "$(dirname "${sysroot_directory}")/aarch64-w64-mingw32/include/zconf.h"
 unlink  "$(dirname "${sysroot_directory}")/aarch64-w64-mingw32/include/zlib.h"
 
