@@ -69,7 +69,11 @@ curl \
 tar \
 	--directory="$(dirname "${sysroot_directory}")" \
 	--extract \
-	--file="${sysroot_tarball}"
+	--file="${sysroot_tarball}" \
+	--no-same-owner \
+	--no-same-permissions \
+	--touch \
+	--delay-directory-restore
 
 unlink  "$(dirname "${sysroot_directory}")/aarch64-w64-mingw32/include/zconf.h"
 unlink  "$(dirname "${sysroot_directory}")/aarch64-w64-mingw32/include/zlib.h"
