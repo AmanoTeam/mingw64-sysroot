@@ -69,7 +69,7 @@ curl \
 	--output "${sysroot_tarball}"
 
 tar \
-	--directory="$(dirname "${sysroot_directory}")" \
+	--directory="${sysroot_directory}" \
 	--extract \
 	--file="${sysroot_tarball}" \
 	--no-same-owner \
