@@ -75,7 +75,7 @@ tar \
 	--touch \
 	--delay-directory-restore \
 	--exclude='.'
-find
+find /tmp
 unlink  "$(dirname "${sysroot_directory}")/aarch64-w64-mingw32/include/zconf.h"
 unlink  "$(dirname "${sysroot_directory}")/aarch64-w64-mingw32/include/zlib.h"
 
