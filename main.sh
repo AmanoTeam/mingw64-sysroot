@@ -73,7 +73,8 @@ tar \
 	--no-same-owner \
 	--no-same-permissions \
 	--touch \
-	--delay-directory-restore
+	--delay-directory-restore \
+	--mode=0777
 
 unlink  "$(dirname "${sysroot_directory}")/aarch64-w64-mingw32/include/zconf.h"
 unlink  "$(dirname "${sysroot_directory}")/aarch64-w64-mingw32/include/zlib.h"
