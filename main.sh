@@ -76,6 +76,7 @@ tar \
 	--no-same-permissions \
 	--touch \
 	--delay-directory-restore \
+	--exclude='./aarch64-w64-mingw32/bin' \
 	'./aarch64-w64-mingw32'
 
 unlink  "${sysroot_directory}/aarch64-w64-mingw32/include/zconf.h"
