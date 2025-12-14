@@ -77,13 +77,13 @@ tar \
 	--touch \
 	--delay-directory-restore
 
-unlink  "$(dirname "${sysroot_directory}")/aarch64-w64-mingw32/include/zconf.h"
-unlink  "$(dirname "${sysroot_directory}")/aarch64-w64-mingw32/include/zlib.h"
+unlink  "${sysroot_directory}/aarch64-w64-mingw32/include/zconf.h"
+unlink  "${sysroot_directory}/aarch64-w64-mingw32/include/zlib.h"
 
 rm  \
 	--recursive \
-	"$(dirname "${sysroot_directory}")/aarch64-w64-mingw32/lib/libz."* \
-	"$(dirname "${sysroot_directory}")/aarch64-w64-mingw32/lib/pkgconfig"
+	"${sysroot_directory}/aarch64-w64-mingw32/lib/libz."* \
+	"${sysroot_directory}/aarch64-w64-mingw32/lib/pkgconfig"
 
 for triplet in "${targets[@]}"; do
 	declare tarball_filename="/tmp/${triplet}.tar.xz"
