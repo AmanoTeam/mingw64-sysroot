@@ -88,7 +88,10 @@ rm  \
 	"${sysroot_directory}/aarch64-w64-mingw32/lib/pkgconfig"
 
 for triplet in "${targets[@]}"; do
-	declare tarball_filename="/tmp/${triplet}.tar.xz"
-	tar --directory="${sysroot_directory}" --create --file=- "${triplet}" | xz --threads='0' --compress -9 > "${tarball_filename}"
+	declare tarball_filename="/tmp/${triplet/-w64-/-unknown-}.tar.xz"
+	
+	mv "${sysroot_directory}/${triplet}" "${sysroot_directory}/${triplet/-w64-/-unknown-}"
+	
+	tar --directory="${sysroot_directory}" --create --file=- "${triplet/-w64-/-unknown-}" | xz --threads='0' --compress -9 > "${tarball_filename}"
 	sha256sum "${tarball_filename}" | sed 's|/tmp/||' > "${tarball_filename}.sha256"
 done
