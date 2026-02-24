@@ -2,98 +2,51 @@
 
 set -eu
 
-declare -r sysroot_tarball='/tmp/sysroot.tar.zst'
-declare -r sysroot_directory="${HOME}/tmp/usr"
+declare -r sysroot_directory="/tmp/${CROSS_COMPILE_TRIPLET}"
 
-declare -ra targets=(
-	'x86_64-w64-mingw32'
-	'i686-w64-mingw32'
-	'aarch64-w64-mingw32'
-)
+declare extra_flags=''
 
-mkdir --parent "${sysroot_directory}"
+git clone https://git.code.sf.net/p/mingw-w64/mingw-w64
+mkdir mingw-w64/build
+cd mingw-w64/build
 
-curl \
-	--url 'https://archlinux.org/packages/extra/any/mingw-w64-crt/download/' \
-	--retry '30' \
-	--retry-delay '0' \
-	--retry-all-errors \
-	--retry-max-time '0' \
-	--location \
-	--silent \
-	--output "${sysroot_tarball}"
+if [ "${CROSS_COMPILE_TRIPLET}" = 'x86_64-w64-mingw32' ]; then
+	extra_flags+=' --disable-lib32'
+fi
 
-tar \
-	--directory="$(dirname "${sysroot_directory}")" \
-	--extract \
-	--file="${sysroot_tarball}"
+../configure \
+	--with-default-msvcrt='msvcrt' \
+	--with-default-win32-winnt='0x0501' \
+	--host="${CROSS_COMPILE_TRIPLET}" \
+	--prefix="${sysroot_directory}" \
+	--with-sysroot="${sysroot_directory}" \
+	${extra_flags}
 
-curl \
-	--url 'https://archlinux.org/packages/extra/any/mingw-w64-headers/download/' \
-	--retry '30' \
-	--retry-delay '0' \
-	--retry-all-errors \
-	--retry-max-time '0' \
-	--location \
-	--silent \
-	--output "${sysroot_tarball}"
+make install
 
-tar \
-	--directory="$(dirname "${sysroot_directory}")" \
-	--extract \
-	--file="${sysroot_tarball}"
+../mingw-w64-libraries/winpthreads/configure \
+	--host="${CROSS_COMPILE_TRIPLET}" \
+	--prefix="${sysroot_directory}"
 
-curl \
-	--url 'https://archlinux.org/packages/extra/any/mingw-w64-winpthreads/download/' \
-	--retry '30' \
-	--retry-delay '0' \
-	--retry-all-errors \
-	--retry-max-time '0' \
-	--location \
-	--silent \
-	--output "${sysroot_tarball}"
+make install
 
-tar \
-	--directory="$(dirname "${sysroot_directory}")" \
-	--extract \
-	--file="${sysroot_tarball}"
+../mingw-w64-libraries/winstorecompat/configure \
+	--host="${CROSS_COMPILE_TRIPLET}" \
+	--prefix="${sysroot_directory}"
 
-curl \
-	--url 'https://github.com/Windows-on-ARM-Experiments/mingw-woarm64-build/releases/latest/download/aarch64-w64-mingw32-msvcrt-toolchain.tar.gz' \
-	--retry '30' \
-	--retry-delay '0' \
-	--retry-all-errors \
-	--retry-max-time '0' \
-	--location \
-	--silent \
-	--output "${sysroot_tarball}"
+make install
 
-tar \
-	--directory="${sysroot_directory}" \
-	--extract \
-	--file="${sysroot_tarball}" \
-	--no-same-owner \
-	--no-same-permissions \
-	--touch \
-	--delay-directory-restore \
-	--exclude='./aarch64-w64-mingw32/bin' \
-	'./aarch64-w64-mingw32'
+../mingw-w64-libraries/libmangle/configure \
+	--host="${CROSS_COMPILE_TRIPLET}" \
+	--prefix="${sysroot_directory}"
 
-unlink  "${sysroot_directory}/aarch64-w64-mingw32/include/zconf.h"
-unlink  "${sysroot_directory}/aarch64-w64-mingw32/include/zlib.h"
+make install
 
-rm  \
-	--recursive \
-	"${sysroot_directory}/aarch64-w64-mingw32/lib/libz."* \
-	"${sysroot_directory}/aarch64-w64-mingw32/lib/pkgconfig"
+declare tarball_filename="/tmp/${CROSS_COMPILE_TRIPLET}.tar.xz"
 
-for triplet in "${targets[@]}"; do
-	declare tarball_filename="/tmp/${triplet}.tar.xz"
-	
-	if [ "${triplet}" != 'aarch64-w64-mingw32' ]; then
-		mv "${sysroot_directory}/${triplet}/bin/lib"*'.dll' "${sysroot_directory}/${triplet}/lib"
-	fi
-	
-	tar --directory="${sysroot_directory}" --create --file=- "${triplet}" | xz --threads='0' --compress -9 > "${tarball_filename}"
-	sha256sum "${tarball_filename}" | sed 's|/tmp/||' > "${tarball_filename}.sha256"
-done
+if [ "${CROSS_COMPILE_TRIPLET}" != 'aarch64-w64-mingw32' ]; then
+	mv "${sysroot_directory}/bin/lib"*'.dll' "${sysroot_directory}/lib"
+fi
+
+tar --directory='/tmp' --create --file=- "${CROSS_COMPILE_TRIPLET}" | xz --threads='0' --compress -9 > "${tarball_filename}"
+sha256sum "${tarball_filename}" | sed 's|/tmp/||' > "${tarball_filename}.sha256"
