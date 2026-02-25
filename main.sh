@@ -30,12 +30,6 @@ make install
 
 make install
 
-../mingw-w64-libraries/winstorecompat/configure \
-	--host="${CROSS_COMPILE_TRIPLET}" \
-	--prefix="${sysroot_directory}"
-
-make install
-
 ../mingw-w64-libraries/libmangle/configure \
 	--host="${CROSS_COMPILE_TRIPLET}" \
 	--prefix="${sysroot_directory}"
