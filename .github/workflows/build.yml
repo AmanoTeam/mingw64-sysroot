@@ -1,9 +1,16 @@
 name: Build
 
 on:
+  schedule:
+    - cron: '0 23 * * *'
+  workflow_dispatch:
+    branches:
+        - '**'
   push:
     branches:
         - '**'
+
+permissions: write-all
 
 jobs:
   cross-build:
